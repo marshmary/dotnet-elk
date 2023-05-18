@@ -1,0 +1,10 @@
+filebeat.inputs:
+- type: filestream 
+  id: dotnet-elk
+  paths:
+    - /usr/logs/*.log
+
+tail_files: true
+
+output.logstash:
+  hosts: ["logstash:5044"]

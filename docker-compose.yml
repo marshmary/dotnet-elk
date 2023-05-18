@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+  dotnetelk:
+    hostname: dotetelk
+    image: dotnetelk
+    build:
+      context: app
+      dockerfile: ./Dockerfile
+    ports:
+      - 5190:5190
+    networks:
+      - elk-stack
+    volumes:
+      - filebeat-vol:/app/serilogs
+  
+  filebeat:
+    hostname: filebeat
+    image: filebeat
+    build:
+      context: filebeat
+      dockerfile: ./Dockerfile
+    networks:
+      - elk-stack
+    volumes:
+      - filebeat-vol:/usr/logs
+  
+  logstash:
+    hostname: logstash
+    image: elastic/logstash:8.7.1
+    volumes:
+      - ./logstash/pipeline.conf:/etc/logstash/conf.d/pipeline.conf
+    environment:
+      LOG_LEVEL: info
+    ports:
+      - 5044:5044
+      - 9600:9600 #monitor
+    networks:
+      - elk-stack
+
+networks:
+  elk-stack:
+    driver: bridge
+
+volumes:
+  filebeat-vol:
